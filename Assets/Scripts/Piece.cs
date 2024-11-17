@@ -69,8 +69,18 @@ public class Piece : MonoBehaviour {
     }
 
     private void Rotate(int direction){
+        int originalRotation = rotationIndex;
         rotationIndex = (rotationIndex + direction) % 4;
 
+        ApplyRotationMatrix(direction);
+
+        if(!TestWallKicks(rotationIndex, direction)){
+            rotationIndex = originalRotation;
+            ApplyRotationMatrix(-direction);
+        }
+    }
+
+    private void ApplyRotationMatrix(int direction){
         for (int i = 0; i < cells.Length; i++)
         {
             Vector3 cell = cells[i];
@@ -94,5 +104,29 @@ public class Piece : MonoBehaviour {
 
             cells[i] = new Vector3Int(x, y, 0);
         }
+    }
+
+    private bool TestWallKicks(int rotationIndex, int rotationDirection){
+        int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
+
+        for (int i = 0; i < data.wallKicks.GetLength(1); i++){
+            Vector2Int translation = data.wallKicks[wallKickIndex, i];
+            
+            if(Move(translation)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int GetWallKickIndex(int rotationIndex, int rotationDirection){
+        int wallKickIndex = rotationIndex * 2;
+
+        if(rotationDirection < 0){
+            wallKickIndex--;
+        }
+
+        return wallKickIndex % data.wallKicks.GetLength(0);
     }
 }
