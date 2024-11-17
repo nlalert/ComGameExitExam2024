@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -9,6 +10,10 @@ public class Board : MonoBehaviour
     public Vector3Int spawnPosition;
     public Vector2Int boardSize = new Vector2Int(10, 20);
 
+    private List<TetrominoData> tetrominoBag = new List<TetrominoData>();
+    public TileBase[] availableTiles;
+    private List<Tile> tileBag = new List<Tile>();
+
     public RectInt Bounds{
         get{
             Vector2Int position = new Vector2Int(-boardSize.x / 2, -boardSize.y / 2);
@@ -16,13 +21,16 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void Awake(){
+    private void Awake() {
         tilemap = GetComponentInChildren<Tilemap>();
         activePiece = GetComponentInChildren<Piece>();
 
         for (int i = 0; i < tetrominos.Length; i++) {
             tetrominos[i].Initialize();
         }
+
+        RefillBag(); // Initialize Tetromino bag
+        RefillTileBag(); // Initialize Tile bag
     }
 
     private void Start(){
@@ -30,16 +38,62 @@ public class Board : MonoBehaviour
     }
 
     public void SpawnPiece(){
-        int random = Random.Range(0, tetrominos.Length);
-        TetrominoData data = tetrominos[random];
+        if (tetrominoBag.Count == 0) {
+            RefillBag();
+        }
+        
+        if (tileBag.Count == 0) {
+            RefillTileBag();
+        }
+
+        // Draw a Tetromino from the Tetromino bag
+        TetrominoData data = tetrominoBag[0];
+        tetrominoBag.RemoveAt(0);
+
+        // Assign a tile from the Tile bag
+        data.tile = tileBag[0];
+        tileBag.RemoveAt(0);
 
         activePiece.Initialize(this, spawnPosition, data);
 
-        if(IsValidPosition(activePiece, spawnPosition)){
+        if (IsValidPosition(activePiece, spawnPosition)){
             Set(activePiece);
-        }
-        else{
+        } else {
             GameOver();
+        }
+    }
+
+    private void RefillBag(){
+        tetrominoBag.Clear();
+
+        // Add all Tetrominoes to the bag
+        foreach (TetrominoData tetromino in tetrominos) {
+            tetrominoBag.Add(tetromino);
+        }
+
+        // Shuffle the bag
+        for (int i = 0; i < tetrominoBag.Count; i++) {
+            int randomIndex = Random.Range(0, tetrominoBag.Count);
+            TetrominoData temp = tetrominoBag[i];
+            tetrominoBag[i] = tetrominoBag[randomIndex];
+            tetrominoBag[randomIndex] = temp;
+        }
+    }
+
+    private void RefillTileBag() {
+        tileBag.Clear();
+
+        // Add all tiles to the bag
+        foreach (Tile tile in availableTiles) {
+            tileBag.Add(tile);
+        }
+
+        // Shuffle the tiles
+        for (int i = 0; i < tileBag.Count; i++) {
+            int randomIndex = Random.Range(0, tileBag.Count);
+            Tile temp = tileBag[i];
+            tileBag[i] = tileBag[randomIndex];
+            tileBag[randomIndex] = temp;
         }
     }
 
