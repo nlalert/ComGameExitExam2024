@@ -18,4 +18,45 @@ public class Piece : MonoBehaviour {
             cells[i] = (Vector3Int) data.cells[i];
         }
     }
+
+    public void Update(){
+        board.Clear(this);
+
+        if(Input.GetKeyDown(KeyCode.LeftArrow)){
+            Move(Vector2Int.left);
+        }
+        else if(Input.GetKeyDown(KeyCode.RightArrow)){
+            Move(Vector2Int.right);
+        }
+
+        if(Input.GetKeyDown(KeyCode.DownArrow)){
+            Move(Vector2Int.down);
+        }
+
+        if(Input.GetKeyDown(KeyCode.Space)){
+            Move(Vector2Int.down);
+        }
+
+        board.Set(this);
+    }
+    
+    private void HardDrop(){
+        while(Move(Vector2Int.down)){
+            continue;
+        }
+    }
+
+    private bool Move(Vector2Int translation){
+        Vector3Int newPosition = position;
+        newPosition.x += translation.x;
+        newPosition.y += translation.y;
+
+        bool valid = board.IsValidPosition(this, newPosition);
+
+        if(valid){
+            position = newPosition;
+        }
+
+        return valid;
+    }
 }
