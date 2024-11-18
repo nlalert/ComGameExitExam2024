@@ -648,6 +648,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   holdBoard: {fileID: 1738230663}
+  nextBoard: {fileID: 1048392150}
   tetrominos:
   - tetromino: 0
     tile: {fileID: 11400000, guid: def3fc58f67c51349b42fb613c49b9ae, type: 2}

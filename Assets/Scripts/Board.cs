@@ -5,7 +5,8 @@ using UnityEngine.Tilemaps;
 public class Board : MonoBehaviour
 {
     public HoldBoard holdBoard; // Assign this in the Unity Editor
-    
+    public NextBoard nextBoard; // Assign this in the Unity Editor
+
     public Tilemap tilemap { get; private set; }
     public Piece activePiece { get; private set; }
     public TetrominoData[] tetrominos;
@@ -31,7 +32,7 @@ public class Board : MonoBehaviour
             tetrominos[i].Initialize();
         }
 
-        RefillBag(); // Initialize Tetromino bag
+        RefillTetrominoBag(); // Initialize Tetromino bag
         RefillTileBag(); // Initialize Tile bag
     }
 
@@ -40,13 +41,7 @@ public class Board : MonoBehaviour
     }
 
     public void SpawnPiece(){
-        if (tetrominoBag.Count == 0) {
-            RefillBag();
-        }
-        
-        if (tileBag.Count == 0) {
-            RefillTileBag();
-        }
+        RefillBags();
 
         // Draw a Tetromino from the Tetromino bag
         TetrominoData data = tetrominoBag[0];
@@ -60,12 +55,28 @@ public class Board : MonoBehaviour
 
         if (IsValidPosition(activePiece, spawnPosition)){
             Set(activePiece);
+            SetNextPiece();
         } else {
             GameOver();
         }
     }
+    private void SetNextPiece(){
+        RefillBags();
+        TetrominoData data = tetrominoBag[0];
+        data.tile = tileBag[0];
+        nextBoard.SetNextPiece(data);
+    }
 
-    private void RefillBag(){
+    private void RefillBags(){
+        if (tetrominoBag.Count == 0) {
+            RefillTetrominoBag();
+        }
+        
+        if (tileBag.Count == 0) {
+            RefillTileBag();
+        }
+    }
+    private void RefillTetrominoBag(){
         tetrominoBag.Clear();
 
         // Add all Tetrominoes to the bag

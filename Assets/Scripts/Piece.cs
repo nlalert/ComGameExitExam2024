@@ -52,18 +52,18 @@ public class Piece : MonoBehaviour {
                 Move(Vector2Int.down);
             }
 
-            if(Input.GetKey(KeyCode.UpArrow)){
-                Rotate(1);
-            }
-            
-            if(Input.GetKey(KeyCode.Space)){
-                HardDrop();
-            }
-
             nextMoveTime = Time.time + moveDelayInSecond;
         }
 
-        if(Input.GetKey(KeyCode.C)){
+        if(Input.GetKeyDown(KeyCode.UpArrow)){
+            Rotate(1);
+        }
+        
+        if(Input.GetKeyDown(KeyCode.Space)){
+            HardDrop();
+        }
+
+        if(Input.GetKeyDown(KeyCode.C)){
             Hold();
         }
         

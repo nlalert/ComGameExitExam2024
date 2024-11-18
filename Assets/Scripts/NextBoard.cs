@@ -1,18 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public class NextBoard : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+public class NextBoard : MonoBehaviour {
+    public Tilemap tilemap { get; private set; }
+    private TetrominoData nextPieceData;
+
+    private void Awake() {
+        tilemap = GetComponentInChildren<Tilemap>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void SetNextPiece(TetrominoData data) {
+        ClearBoard();
+        nextPieceData = data;
+
+        if (data != null) {
+            // Center the piece visually in the Hold board area
+            Vector3Int centerPosition = Vector3Int.zero;
+            foreach (Vector2Int cell in data.cells) {
+                Vector3Int tilePosition = new Vector3Int(cell.x, cell.y, 0) + centerPosition;
+                tilemap.SetTile(tilePosition, data.tile);
+            }
+        }
+    }
+
+    public void ClearBoard() {
+        tilemap.ClearAllTiles();
     }
 }
