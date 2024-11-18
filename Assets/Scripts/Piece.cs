@@ -2,6 +2,9 @@ using System;
 using UnityEngine;
 
 public class Piece : MonoBehaviour {
+    private TetrominoData heldPieceData; // The currently held piece
+    private bool hasHeld = false; // Prevent holding multiple times in one piece cycle
+
     public Board board { get; private set; }
     public TetrominoData data { get; private set; }
     public Vector3Int[] cells { get; private set; }
@@ -60,11 +63,36 @@ public class Piece : MonoBehaviour {
             nextMoveTime = Time.time + moveDelayInSecond;
         }
 
+        if(Input.GetKey(KeyCode.C)){
+            Hold();
+        }
+        
         if(Time.time >= stepTime){
             Step();
         }
 
         board.Set(this);
+    }
+
+    private void Hold() {
+        if (hasHeld) return; // Only allow holding once per drop cycle
+
+        if (heldPieceData == null) {
+            // If no piece is currently held, store the active piece and spawn a new one
+            heldPieceData = data;
+            board.SpawnPiece();
+        } else {
+            // If a piece is already held, swap the held piece with the active piece
+            TetrominoData temp = data;
+            data = heldPieceData;
+            heldPieceData = temp;
+            Initialize(board, board.spawnPosition, data); // Reinitialize the active piece
+        }
+
+        // Update the HoldBoard to display the held piece
+        board.holdBoard.SetHeldPiece(heldPieceData);
+
+        hasHeld = true;
     }
 
     private void Step(){
@@ -89,6 +117,7 @@ public class Piece : MonoBehaviour {
         board.Set(this);
         board.ClearLine();
         board.SpawnPiece();
+        hasHeld = false; // Reset hold status for the next piece
     }
     
     private bool Move(Vector2Int translation){

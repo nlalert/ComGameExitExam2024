@@ -4,6 +4,8 @@ using UnityEngine.Tilemaps;
 
 public class Board : MonoBehaviour
 {
+    public HoldBoard holdBoard; // Assign this in the Unity Editor
+    
     public Tilemap tilemap { get; private set; }
     public Piece activePiece { get; private set; }
     public TetrominoData[] tetrominos;
